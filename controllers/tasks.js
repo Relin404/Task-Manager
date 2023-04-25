@@ -1,34 +1,55 @@
-const tasks = [];
+const { Task } = require("../models/task");
+const _ = require("lodash");
+const mongoose = require("mongoose");
 
-const createTask = (req, res) => {
-  const task = req.body.task ? req.body.task : "empty";
-  tasks.push(tasks);
-  res.json(task);
+// POST /
+const createTask = async (req, res) => {
+  const { name, checked } = _.pick(req.body, ["name", "checked"]);
+  const task = await Task.create({
+    name,
+    checked: checked ? checked : false,
+  });
+
+  res.status(201).send(task);
 };
 
-const getAllTasks = (req, res) => {
+// GET /
+const getAllTasks = async (req, res) => {
+  const tasks = await Task.find().sort("name");
+
   res.send(tasks);
 };
 
-const getTask = (req, res) => {
+// GET /:id
+const getTask = async (req, res) => {
   const id = req.params.id;
-  const indexOfTask = tasks.at(id);
-  res.json(tasks[indexOfTask]);
+  const task = await Task.findById(id);
+
+  if (!task) return res.status(404).send("Task not found.");
+  res.send(task);
 };
 
-const updateTask = (req, res) => {
+// PATCH /:id
+const updateTask = async (req, res) => {
   const id = req.params.id;
-  const newTask = req.body.task;
-  const indexOfTask = tasks.at(id);
-  tasks[indexOfTask] = newTask;
-  res.json(tasks[indexOfTask]);
+  const { name, checked } = _.pick(req.body, ["name", "checked"]);
+  const task = await Task.findByIdAndUpdate(
+    id,
+    { name, checked },
+    { new: true }
+  );
+
+  if (!task) return res.status(404).send("Task not found.");
+  res.send(task);
 };
 
-const deleteTask = (req, res) => {
+// DELETE /:id
+const deleteTask = async (req, res) => {
   const id = req.params.id;
-  const indexOfTask = tasks.at(id);
-  // tasks.slice
-  res.json(tasks[indexOfTask]);
+  const task = await Task.findByIdAndRemove(id);
+
+  if (!task) return res.status(404).send("Task not found.");
+  res.send(task);
 };
 
 module.exports = {
