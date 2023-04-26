@@ -16,7 +16,7 @@ const createTask = asyncWrapper(async (req, res) => {
 
 // GET /
 const getAllTasks = asyncWrapper(async (req, res) => {
-  const tasks = await Task.find().sort("name");
+  const tasks = await Task.find().sort({ name: 1 });
 
   res.send(tasks);
 });
