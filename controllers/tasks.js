@@ -1,9 +1,10 @@
 const { Task } = require("../models/task");
+const asyncWrapper = require("../middleware/async");
 const _ = require("lodash");
 const mongoose = require("mongoose");
 
 // POST /
-const createTask = async (req, res) => {
+const createTask = asyncWrapper(async (req, res) => {
   const { name, checked } = _.pick(req.body, ["name", "checked"]);
   const task = await Task.create({
     name,
@@ -11,26 +12,26 @@ const createTask = async (req, res) => {
   });
 
   res.status(201).send(task);
-};
+});
 
 // GET /
-const getAllTasks = async (req, res) => {
+const getAllTasks = asyncWrapper(async (req, res) => {
   const tasks = await Task.find().sort("name");
 
   res.send(tasks);
-};
+});
 
 // GET /:id
-const getTask = async (req, res) => {
+const getTask = asyncWrapper(async (req, res) => {
   const id = req.params.id;
   const task = await Task.findById(id);
 
   if (!task) return res.status(404).send("Task not found.");
   res.send(task);
-};
+});
 
 // PATCH /:id
-const updateTask = async (req, res) => {
+const updateTask = asyncWrapper(async (req, res) => {
   const id = req.params.id;
   const { name, checked } = _.pick(req.body, ["name", "checked"]);
   const task = await Task.findByIdAndUpdate(
@@ -41,16 +42,16 @@ const updateTask = async (req, res) => {
 
   if (!task) return res.status(404).send("Task not found.");
   res.send(task);
-};
+});
 
 // DELETE /:id
-const deleteTask = async (req, res) => {
+const deleteTask = asyncWrapper(async (req, res) => {
   const id = req.params.id;
   const task = await Task.findByIdAndRemove(id);
 
   if (!task) return res.status(404).send("Task not found.");
   res.send(task);
-};
+});
 
 module.exports = {
   getAllTasks,
